@@ -53,6 +53,13 @@ class VideoCaptureThreading:
             else:
                 logging.warning("Camera thread Frame not grabbed!")
                 time.sleep(1)
+                self.cap.release() 
+                try:
+                    self.cap = cv2.VideoCapture(self.src)
+                    if self.cap.isOpened():
+                        print("Continue the program")
+                except:
+                    print("Couldn't open the camera:", self.src)
     def read(self):
         with self.read_lock:
             frame = self.frame.copy()
