@@ -1,11 +1,13 @@
-"""CLEANED"""
 import torch.nn as nn
 from trnsfrmkl import TPS_SpatialTransformerNetwork
 from futrextr import ResNet_FeatureExtractor
 from mdlseq import BidirectionalLSTM
 from dictpred import Attention
+from dtst import MyAlignCollate
+import torch
 
-
+# from cfour import AlignCollate_demo 
+AlignCollate_demo = MyAlignCollate(imgH=32, imgW=100, keep_ratio_with_pad=False)
 class Model(nn.Module):
 
     def __init__(self):
@@ -22,7 +24,7 @@ class Model(nn.Module):
         # elif opt.FeatureExtraction == 'ResNet':
         self.FeatureExtraction = ResNet_FeatureExtractor(1,512)
         self.FeatureExtraction_output = 512  # int(imgH/16-1) * 512
-        self.AdaptiveAvgPool = nn.AdaptiveAvgPool2d((None, 1))  # Transform final (imgH/16-1) -> 1
+        self.AdaptiveAvgPool = nn.AdaptiveAvgPool2d((512,1))  # Transform final (imgH/16-1) -> 1
 
         """ Sequence modeling"""
         self.SequenceModeling = nn.Sequential(
@@ -34,8 +36,14 @@ class Model(nn.Module):
         """ Prediction """
         self.Prediction = Attention(self.SequenceModeling_output, 256, 96)
 
-    def forward(self, input, text, is_train=True):
+    def forward(self, input):
         """ Transformation stage """
+        # print(input)
+        # print("In Model input: ",input.shape)
+        # print("In Model text: ",text.shape)
+        # input = AlignCollate_demo(input)
+        # is_train = False
+        text=torch.zeros(1, 12,dtype=torch.float64)
         if not self.stages['Trans'] == "None":
             input = self.Transformation(input)
 
@@ -45,10 +53,15 @@ class Model(nn.Module):
         visual_feature = visual_feature.squeeze(3)
 
         """ Sequence modeling stage """
-        contextual_feature = self.SequenceModeling(visual_feature)
-
+        if self.stages['Seq'] == 'BiLSTM':
+            contextual_feature = self.SequenceModeling(visual_feature)
+        else:
+            contextual_feature = visual_feature  # for convenience. this is NOT contextually modeled by BiLSTM
+        # print(contextual_feature.shape)
         """ Prediction stage """
- 
-        prediction = self.Prediction(contextual_feature.contiguous(), text, is_train, batch_max_length=11)
+        if self.stages['Pred'] == 'CTC':
+            prediction = self.Prediction(contextual_feature.contiguous())
+        else:
+            prediction = self.Prediction(contextual_feature.contiguous(), text, batch_max_length=11)
 
         return prediction

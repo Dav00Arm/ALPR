@@ -1,4 +1,4 @@
-"""CLEANED"""
+# vim: expandtab:ts=4:sw=4
 import numpy as np
 import scipy.linalg
 
@@ -20,7 +20,7 @@ chi2inv95 = {
     9: 16.919}
 
 
-class KalmanFilter(object): 
+class KalmanFilter(object):
     """
     A simple Kalman filter for tracking bounding boxes in image space.
 
@@ -69,7 +69,6 @@ class KalmanFilter(object):
             to 0 mean.
 
         """
-
         mean_pos = measurement
         mean_vel = np.zeros_like(mean_pos)
         mean = np.r_[mean_pos, mean_vel]
@@ -84,7 +83,6 @@ class KalmanFilter(object):
             1e-5,
             10 * self._std_weight_velocity * measurement[3]]
         covariance = np.diag(np.square(std))
-
         return mean, covariance
 
     def predict(self, mean, covariance):

@@ -1,7 +1,7 @@
-"""CLEANED"""
 import threading
 import cv2
 import time
+import json
 import logging
 
 class VideoCaptureThreading:
@@ -10,6 +10,7 @@ class VideoCaptureThreading:
         self.cap = cv2.VideoCapture(self.src)
         self.resolution = resolution
         self.skip = skip
+        self.stopping = False
         if fourcc:
             self.cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*fourcc))
         if resolution is not None:
@@ -19,8 +20,12 @@ class VideoCaptureThreading:
         self.grabbed, self.frame = self.cap.read()
         self.started = False
         self.read_lock = threading.Lock()
+        self.fps = FPS()
         self.frames_grabbed = 0
         self.wait = wait
+        if fps:
+            self.cap.set(cv2.CAP_PROP_FPS, fps)
+
 
     def set(self, var1, var2):
         self.cap.set(var1, var2)
@@ -42,24 +47,15 @@ class VideoCaptureThreading:
                 for i in range(self.skip):
                     self.cap.grab()
             grabbed, frame = self.cap.read()
+            # fps = self.fps()
             if grabbed:
-                self.frames_grabbed+=1
                 with self.read_lock:
                     self.grabbed = grabbed
                     self.frame = frame
-                if self.frames_grabbed % 20 == 1:
-                    pass
                     #logging.debug(f"Camera {self.src} thread fps: {fps:.2f}")
             else:
-                logging.warning("Camera thread Frame not grabbed!")
-                time.sleep(1)
-                self.cap.release() 
-                try:
-                    self.cap = cv2.VideoCapture(self.src)
-                    if self.cap.isOpened():
-                        print("Continue the program")
-                except:
-                    print("Couldn't open the camera:", self.src)
+                # logging.warning("Camera thread Frame not grabbed!")
+                self.stopping = True
     def read(self):
         with self.read_lock:
             frame = self.frame.copy()
@@ -68,8 +64,11 @@ class VideoCaptureThreading:
     def generator(self):
         while True:
             with self.read_lock:
-                frame = self.frame.copy()
-                grabbed = self.grabbed
+                if self.frame is None:
+                    grabbed = False
+                else:
+                    frame = self.frame.copy()
+                    grabbed = self.grabbed
             if grabbed:
                 yield frame
             else:
@@ -77,6 +76,28 @@ class VideoCaptureThreading:
     def stop(self):
         self.started = False
         self.thread.join()
-
-    def __exit__(self, exec_type, exc_value, traceback):
         self.cap.release()
+
+    # def __exit__(self, exec_type, exc_value, traceback):
+    #     self.cap.release()
+
+class FPS:
+    def __init__(self,decay=0.1):
+        self.last_timestamp = time.time()
+        self.decay = decay
+        self.ema_fps = 0.0
+
+    def __call__(self):
+        ts = time.time()
+        passed = ts - self.last_timestamp
+        self.last_timestamp = ts
+        self.ema_fps = 1./passed*self.decay+self.ema_fps*(1.-self.decay)
+        return self.ema_fps
+
+
+if __name__ == '__main__':
+
+    st = time.time()
+    with open('./config.json', 'rb') as f:
+        print(type(json.load(f)))
+    print("Taked time {}".format(time.time() - st))

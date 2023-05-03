@@ -1,4 +1,4 @@
-"""CLEANED"""
+# vim: expandtab:ts=4:sw=4
 from __future__ import absolute_import
 import numpy as np
 from scipy.optimize import linear_sum_assignment
@@ -75,6 +75,7 @@ def min_cost_matching(
             matches.append((track_idx, detection_idx))
     return matches, unmatched_tracks, unmatched_detections
 
+
 def matching_cascade(
         distance_metric, max_distance, cascade_depth, tracks, detections,
         track_indices=None, detection_indices=None):
@@ -136,7 +137,6 @@ def matching_cascade(
             min_cost_matching(
                 distance_metric, max_distance, tracks, detections,
                 track_indices_l, unmatched_detections)
-        #[(2, 0), (3, 1)]
         matches += matches_l
     unmatched_tracks = list(set(track_indices) - set(k for k, _ in matches))
     return matches, unmatched_tracks, unmatched_detections

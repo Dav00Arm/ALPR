@@ -1,4 +1,5 @@
-"""CLEANED"""
+# vim: expandtab:ts=4:sw=4
+
 
 class TrackState:
     """
@@ -154,6 +155,11 @@ class Track:
             self.state = TrackState.Deleted
         elif self.time_since_update > self._max_age:
             self.state = TrackState.Deleted
+
+    def is_tentative(self):
+        """Returns True if this track is tentative (unconfirmed).
+        """
+        return self.state == TrackState.Tentative
 
     def is_confirmed(self):
         """Returns True if this track is confirmed."""

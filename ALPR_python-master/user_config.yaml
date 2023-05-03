@@ -1,0 +1,63 @@
+INSTRUCTIONS: "
+  ATTENTION!
+    DONT CHANGE THE NAME OF THIS FILE.
+
+  url: Add all url(s) in list. If 1 camera used for multiple spots paste the same url multilpe times.
+    Example: 
+      url: ['rtsp://user:password@ip1:port/Streaming/Channels/101/', 'rtsp://user:password@ip2:port/Streaming/Channels/101/']
+
+  image_save_path: Path to save images.
+    Example:
+      image_save_path: 'result', 'home/user/folder_name'
+
+  image_name_info: Add info that an image should contain.
+    Options: license number, confidece, time, camera_id, spot_id
+    Example:
+      image_name_info: ['license number', 'time']
+
+  save_csv: Save predictions in database.
+    Options: True, False
+    Example: 
+      save_csv: False
+  
+  csv_name: Name of the csv file of predictions.
+    Example:
+      csv_name: 'output'
+
+  save_vehicle_image: Save the image of the detected vehicle.
+    Options: True, False
+    Example:
+      save_vehicle_image: True
+
+  display_time: Display date and time on the stream image.
+    Options: True, False
+    Example:
+      display_date: False
+
+  display_camera_id: Display camera id on the stream image.
+    Options: True, False
+    Example:
+      display_camera_id: True
+
+  display_spot_id: Display spot id on the stream image.
+  Options: True, False
+  Example:
+    display_spot_id: True
+"
+
+
+image_save_path: 'result'
+
+image_name_info: ['license_number', 'confidence', 'time', 'camera_id', 'spot_id']
+
+save_vehicle_image: False 
+
+save_csv: True
+
+csv_name: 'output'
+
+display_date: True 
+
+display_camera_id: True
+
+display_spot_id: True

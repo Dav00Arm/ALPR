@@ -1,4 +1,3 @@
-"""CLEANED"""
 import requests
 from scapy.all import getmacbyip
 def get_mac(ip):
@@ -16,4 +15,4 @@ def post_data(url,data, name):
             return True
         return False
     except:
-        print("Some problems occured during sending the data")
+        print("Some problems occursd during sending the data")

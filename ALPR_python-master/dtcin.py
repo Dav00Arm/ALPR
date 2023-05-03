@@ -1,8 +1,8 @@
-"""CLEANED"""
+# vim: expandtab:ts=4:sw=4
 import numpy as np
 
 
-class Detection(object): 
+class Detection(object):
     """
     This class represents a bounding box detection in a single image.
 

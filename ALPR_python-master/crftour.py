@@ -1,4 +1,3 @@
-"""CLEANED"""
 import time
 import torch
 from torch.autograd import Variable
@@ -11,7 +10,7 @@ from tuls import params_craft_refiner
 from cfour import *
 
 def craft_preprocess(image,canvas_size=100):
-    _, ratio_h,ratio_w = iprmg.resize_aspect_ratio(image, canvas_size, interpolation=cv2.INTER_LINEAR, mag_ratio=1)
+    img_resized, ratio_h,ratio_w = iprmg.resize_aspect_ratio(image, canvas_size, interpolation=cv2.INTER_LINEAR, mag_ratio=1)
     img_resized = cv2.resize(image,( canvas_size, canvas_size),cv2.INTER_AREA)
     # ratio = args.canvas_size / max(height, width) 
     ratio_h = 1 / ratio_h
@@ -48,8 +47,7 @@ def predict_craft(image,
     '''
     CRAFT inference
     '''
-    # cv2.imshow("plate", image)
-    # cv2.waitKey(0)
+
     x, ratio_h, ratio_w = craft_preprocess(image,canvas_size=canvas_size)
 
     if mode == 'gpu': 
@@ -69,9 +67,10 @@ def predict_craft(image,
         score_text = y[0,:,:,0]
         score_link = y_refiner[0,:,:,0]
 
-    # TODO 
+    #TODO
     elif mode == 'trt':
         pass
+
 
     boxes, polys = get_boxes(score_text, score_link, text_threshold, link_threshold, low_text, poly,ratio_w,ratio_h)
 
@@ -94,8 +93,19 @@ def cropping_image(img,pts):
     cropped = img[y_min:y_max, x_min:x_max].copy()
     pts = pts - pts.min(axis=0)
     mask = np.zeros(cropped.shape[:2], np.uint8)
+    # print("Cropped ",cropped.shape)
+    # print("MASK ",mask.shape)
     cv2.drawContours(mask, [pts], -1, (255, 255, 255), -1, cv2.LINE_AA)
+    # print("CROPPED shape: ",cropped.shape)
+    # cv2.drawContours()
+    # print("MASK ",mask.shape)
     dst = cv2.bitwise_and(cropped, cropped, mask=mask)
+    # cv2.imshow("MASK",mask)
+    # cv2.waitKey(0)
+    # cv2.imshow("DST",dst)
+    # cv2.imshow("CROPPED",cropped)
+    # cv2.waitKey(0)
+    # print("DTS shape: ",np.unique(dst - cropped))
     return dst
 
 def crop_lines(images):
@@ -103,6 +113,7 @@ def crop_lines(images):
     Function for cropping lines in license plate images
     '''
     all_results = []
+    t = time.time()
     for image in images:
         if len(image) == 0:
             all_results.append([])

@@ -1,13 +1,15 @@
-"""CLEANED"""
 from collections import OrderedDict
+from os import supports_dir_fd
 import cv2
 import pandas as pd
+import torch
 import numpy as np
 from cfour import *
 from dtsnd import post_data
+import time
 from shapely.geometry import Polygon
 
-def csv_save(name, prediction, date_time, conf):
+def csv_save(name, prediction, date_time, conf, ):
     new = pd.DataFrame({'Path':[f'./result/{prediction}_{date_time}_{conf}.jpg'],'Time': [date_time], 'Plate': [prediction], 'Confidence': [conf]})
     new.to_csv(name, mode='a', index=False, header=False)
 
@@ -24,7 +26,7 @@ def send_data(car_image, plate_image, cam_id, prediction, date_time, conf,spot_i
         if 'camera_id' in user_configs['image_name_info']:
             name += '_' + str(cam_id)
         print('[{}]: Cam ID: {}  Frame ID: {}  Prediction: {}   confidence: {}%' .format(date_time,cam_id,spot_id,prediction, conf)) 
-        data = {'mac_address':mac_addresses[cam_id],"camera_id":cam_id, "spot_id": spot_id, "license_number": prediction, "confidence":conf, 'time':date_time}
+        data = {"camera_id":str(cam_id), "spot_id": str(spot_id),"mac_address":mac_addresses[cam_id], "license_number": prediction, "confidence":str(conf), "time":date_time}
         cv2.imwrite(path+'plate_'+name+'.jpg', plate_image)
         cv2.imwrite(path+'vehicle_'+name+'.jpg', car_image)
         x = post_data(locator_url, data, name='ALPR')
@@ -43,7 +45,14 @@ def check_change(current_status, prev_status):
             if prev_status[key] == 'Busy' and value == 'Free':
                 return True
     return False
+     
 
+def load_whiteList(path):
+    wl = []
+    with open(path,'r') as f:
+        wl = f.read().split('\n')
+    return wl
+    
 def copyStateDict(state_dict):
     if list(state_dict.keys())[0].startswith("module"):
         start_idx = 1
@@ -113,19 +122,15 @@ def get_centre(box):
     return ((box[1][0] - box[0][0]) /2 ,(box[1][1] - box[0][1]) /2)
 
 def check_box(spots, all_coordinates, last_ids):
-
     spot_dict = {}
     current_spot_dict = {}
     for s in range(len(spots)):
         current_spot_dict[s] = 'Free'
-
     for idx, info in all_coordinates.items():
         img, _, boxes = info[0], info[1], info[2]
-
         for j, b in enumerate(boxes):
             plate_pol = convert_polygon(b)
             for i,spot in enumerate(spots):
-
                 if spot.contains(plate_pol):
                     current_spot_dict[i] = 'Busy' 
                 if last_ids[i] == -1:
@@ -145,3 +150,16 @@ def draw_plate(img,out):
             cv2.rectangle(img,box[0],box[1],color, thickness=2)
             cv2.putText(img,str(idx),(int(box[0][0]),int(box[0][1]-10)),0,0.75,(255,255,255),2)
 
+def box_inter_union(car, spot):
+    spot = [spot[0], spot[1], spot[0]+spot[2], spot[1]+spot[3]]
+
+    car = [car[0][0], car[0][1], car[1][0], car[1][1]]
+    arr1, arr2 = np.array([car]), np.array([spot])
+
+    top_left = np.maximum(arr1[:, :2], arr2[:, :2]) # [[x, y]]
+    bottom_right = np.minimum(arr1[:, 2:], arr2[:, 2:]) # [[x, y]]
+    wh = bottom_right - top_left
+
+    intersection = wh[:, 0].clip(0) * wh[:, 1].clip(0)
+    if intersection>0:return 'Busy'
+    return 'Free'
