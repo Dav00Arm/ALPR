@@ -3,5 +3,6 @@ ALPR_python-master/models/
 ALPR_python-master/deepsort_models/
 ALPR_python-master/__pycache__/
 .idea/
+ALPR_python-master/spot_config.json
 output.csv
 spot_config.json
