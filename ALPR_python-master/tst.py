@@ -89,7 +89,6 @@
 # """REFINER.PTH"""
 
 # import torch.backends.cudnn as cudnn
-# from cfour import *
 
 # craft_pth = CRAFT()
 
@@ -663,7 +662,6 @@
 # cv2.imshow('image', image)
 # cv2.waitKey(0)
 "-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------"
-# from cfour import *
 
 # import torch.onnx 
 
@@ -696,7 +694,6 @@
 # import numpy as np
 # Convert_ONNX(plate_recognition_model.module,example)
 
-from cfour import *
 from csm import VideoCaptureThreading
 import cv2
 video_captures = []
@@ -705,5 +702,5 @@ cap.start()
 # threads.append(cap)
 video_captures.append(cap.generator())
 for frames in zip(*video_captures):
-    cv2.imshow("Image",frames[0])
+    cv2.imshow("Image", frames[0])
     cv2.waitKey(1)

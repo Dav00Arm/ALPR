@@ -261,15 +261,8 @@ class ResizeNormalize(object):
         self.toTensor = transforms.ToTensor()
 
     def __call__(self, img):
-        img = img.resize(self.size,self.interpolation)
-        
-        # img = cv2.resize(img,self.size,self.interpolation)
-        
-        # img = img.resize(self.size, self.interpolation)
+        img = img.resize(self.size, self.interpolation)
         img = self.toTensor(img)
-        # print(img)
-        # print(img.sub_(0.5))
-        # print(img.div_(0.5))
         img.sub_(0.5).div_(0.5)
         return img
 
@@ -332,6 +325,7 @@ class AlignCollate(object):
 
         return image_tensors, labels
 
+
 class MyAlignCollate(object):
 
     def __init__(self, imgH=32, imgW=100, keep_ratio_with_pad=False):
@@ -350,7 +344,6 @@ class MyAlignCollate(object):
             input_channel = 3 if images[0].mode == 'RGB' else 1
             transform = NormalizePAD((input_channel, self.imgH, resized_max_w))
 
-            
             # for image in images:
             w, h = images.size
             ratio = w / float(h)
@@ -368,6 +361,7 @@ class MyAlignCollate(object):
             image_tensors = image_tensors.unsqueeze(0)
         image_tensors = torch.Tensor(image_tensors)
         return image_tensors
+
 
 class Test_Dataset(torch.utils.data.Dataset):
 
@@ -388,6 +382,7 @@ class Test_Dataset(torch.utils.data.Dataset):
         else:
             img = Image.fromarray(img).convert('L')
         return img,self.paths[index]
+
 
 def tensor2im(image_tensor, imtype=np.uint8):
     image_numpy = image_tensor.cpu().float().numpy()

@@ -25,6 +25,7 @@ from genr import (LOGGER, check_requirements, check_suffix, check_version, color
                            make_divisible, non_max_suppression, scale_coords, xywh2xyxy, xyxy2xywh)
 from pslt import Annotator, colors, save_one_box
 from trchutl import copy_attr, time_sync
+from configs.general import general_configs
 
 
 def autopad(k, p=None):  # kernel, padding
@@ -264,7 +265,7 @@ class GhostBottleneck(nn.Module):
 
 class DetectMultiBackend(nn.Module):
     # YOLOv5 MultiBackend class for python inference on various backends
-    def __init__(self, weights='yolov5s.pt', device=torch.device('cpu'), dnn=False, data=None, fp16=False):
+    def __init__(self, weights='yolov5s.pt', device=general_configs['device'], dnn=False, data=None, fp16=False):
 
         from expr import attempt_download, attempt_load  # scoped to avoid circular import
 
@@ -300,7 +301,6 @@ class DetectMultiBackend(nn.Module):
         elif self.onnx:  # ONNX Runtime
             im = im.cpu().numpy()  # torch to numpy
             y = self.session.run([self.session.get_outputs()[0].name], {self.session.get_inputs()[0].name: im})[0]
-            # print("y ",y.shape)
         elif self.xml:  # OpenVINO
             im = im.cpu().numpy()  # FP32
             y = self.executable_network([im])[self.output_layer]
@@ -316,7 +316,7 @@ class DetectMultiBackend(nn.Module):
             y = self.model.predict({'image': im})  # coordinates are xywh normalized
             if 'confidence' in y:
                 box = xywh2xyxy(y['coordinates'] * [[w, h, w, h]])  # xyxy pixels
-                conf, cls = y['confidence'].max(1), y['confidence'].argmax(1).astype(np.float)
+                conf, cls = y['confidence'].max(1), y['confidence'].argmax(1).astype(np.float32)
                 y = np.concatenate((box, conf.reshape(-1, 1), cls.reshape(-1, 1)), 1)
             else:
                 k = 'var_' + str(sorted(int(k.replace('var_', '')) for k in y)[-1])  # output key
@@ -482,7 +482,6 @@ class Detections:
         self.n = len(self.pred)  # number of images (batch size)
         self.t = tuple((times[i + 1] - times[i]) * 1000 / self.n for i in range(3))  # timestamps (ms)
         self.s = shape  # inference BCHW shape
-
 
     def tolist(self):
         # return a list of Detections objects, i.e. 'for result in results.tolist():'

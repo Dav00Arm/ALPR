@@ -6,6 +6,7 @@ from v2 import MobileNetV2, InvertedResidual
 from dse import SSD, GraphPath
 from prdctr import Predictor, Predictor_ONNX
 import v1lite as config
+from configs.general import general_configs
 
 
 def SeperableConv2d(in_channels, out_channels, kernel_size=1, stride=1, padding=0, onnx_compatible=False):
@@ -59,21 +60,22 @@ def create_mobilenetv2_ssd_lite(num_classes, width_mult=1.0, use_batch_norm=True
                extras, classification_headers, regression_headers, is_test=is_test, config=config)
 
 
-def create_mobilenetv2_ssd_lite_predictor(net, candidate_size=200, nms_method=None, sigma=0.5, device=torch.device('cpu'), onnx=True):
-    if onnx != True:
+def create_mobilenetv2_ssd_lite_predictor(net, candidate_size=200, nms_method=None, sigma=0.5,
+                                          device=general_configs['device'], onnx=True):
+    if not onnx:
         predictor = Predictor(net, config.image_size, config.image_mean,
-                            config.image_std,
-                            nms_method=nms_method,
-                            iou_threshold=config.iou_threshold,
-                            candidate_size=candidate_size,
-                            sigma=sigma,
-                            device=device)
+                              config.image_std,
+                              nms_method=nms_method,
+                              iou_threshold=config.iou_threshold,
+                              candidate_size=candidate_size,
+                              sigma=sigma,
+                              device=device)
     else:
         predictor = Predictor_ONNX(net, config.image_size, config.image_mean,
-                                config.image_std,
-                                nms_method=nms_method,
-                                iou_threshold=config.iou_threshold,
-                                candidate_size=candidate_size,
-                                sigma=sigma,
-                                device=device)
+                                   config.image_std,
+                                   nms_method=nms_method,
+                                   iou_threshold=config.iou_threshold,
+                                   candidate_size=candidate_size,
+                                   sigma=sigma,
+                                   device=device)
     return predictor

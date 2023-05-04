@@ -3,13 +3,12 @@ from Cython.Build import cythonize
 from getmac import get_mac_address as gma
 import os
 
-# fname = 'cfour.py'
 # data = gma()
 # with open(fname, 'a') as f:
 #     f.write(f'\nmc_address = {[data]}')
 
 setup(
-    ext_modules = cythonize(['aug.py', 'ach.py', 'bun.py', 'bu.py', 'cmn.py', 'cfour.py', 'crftour.py', 'crftut.py', 
+    ext_modules = cythonize(['aug.py', 'ach.py', 'bun.py', 'bu.py', 'cmn.py', 'crftour.py', 'crftut.py',
                             'crft.py', 'dproc.py', 'dldrs.py', 'dtst.py', 'dtc.py', 'dtcin.py', 'dwn.py', 'esycor.py', 
                             'expr.py', 'pexrt.py', 'futrextr.py', 'flut.py', 'frmod.py', 'genr.py', 'detgenr.py', 'gtmdls.py', 
                             'iprmg.py', 'namlakfltr.py', 'infr.py', 'ichmatch.py', 'licut.py', 'linassig.py', 'mtrc.py', 

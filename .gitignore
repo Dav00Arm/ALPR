@@ -2,7 +2,9 @@ ALPR_python-master/.vscode
 ALPR_python-master/models/
 ALPR_python-master/deepsort_models/
 ALPR_python-master/__pycache__/
+ALPR_python-master/configs/__pycache__/
 .idea/
 ALPR_python-master/spot_config.json
 output.csv
 spot_config.json
+spot_config_test.json

@@ -3,11 +3,12 @@ import numpy as np
 import bu
 from dproc import PredictionTransform
 from pltdtmsc import Timer
+from configs.general import general_configs
 
 
 class Predictor:
-    def __init__(self, net, size, mean=0.0, std=1.0, nms_method=None,
-                 iou_threshold=0.45, filter_threshold=0.01, candidate_size=200, sigma=0.5, device=None):
+    def __init__(self, net, size, mean=0.0, std=1.0, nms_method=None, iou_threshold=0.45,
+                 filter_threshold=0.01, candidate_size=200, sigma=0.5, device=general_configs['device']):
         self.net = net
         self.transform = PredictionTransform(size, mean, std)
         self.iou_threshold = iou_threshold
@@ -16,10 +17,7 @@ class Predictor:
         self.nms_method = nms_method
 
         self.sigma = sigma
-        if device:
-            self.device = device
-        else:
-            self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+        self.device = device
 
         # self.net.to(self.device)
         # self.net.eval()
@@ -74,9 +72,10 @@ class Predictor:
         picked_box_probs[:, 3] *= height
         return picked_box_probs[:, :4], torch.tensor(picked_labels), picked_box_probs[:, 4]
 
+
 class Predictor_ONNX:
-    def __init__(self, net, size, mean=0.0, std=1.0, nms_method=None,
-                 iou_threshold=0.45, filter_threshold=0.01, candidate_size=200, sigma=0.5, device=None):
+    def __init__(self, net, size, mean=0.0, std=1.0, nms_method=None, iou_threshold=0.45,
+                 filter_threshold=0.01, candidate_size=200, sigma=0.5, device=general_configs['device']):
         self.net = net
         self.transform = PredictionTransform(size, mean, std)
         self.iou_threshold = iou_threshold
@@ -88,10 +87,7 @@ class Predictor_ONNX:
         self.ouputs_name_1 = self.net.get_outputs()[0].name
         self.ouputs_name_2 = self.net.get_outputs()[1].name
         self.sigma = sigma
-        if device:
-            self.device = device
-        else:
-            self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+        self.device = device
 
         self.timer = Timer()
 
@@ -99,11 +95,13 @@ class Predictor_ONNX:
         cpu_device = torch.device("cpu")
         height, width, _ = image.shape
         image = self.transform(image)
-        #print(image)
+
         images = image.unsqueeze(0)
-        images = images.to(self.device)
+
+        images = images.to(cpu_device)
         self.timer.start()
-        results = self.net.run([self.ouputs_name_1,self.ouputs_name_2],{self.input_name:np.array(images)})
+        results = self.net.run([self.ouputs_name_1, self.ouputs_name_2], {self.input_name: np.array(images)})
+
         scores, boxes = torch.Tensor(results[0]), torch.Tensor(results[1])
 
         boxes = boxes[0]

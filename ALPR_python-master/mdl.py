@@ -3,11 +3,9 @@ from trnsfrmkl import TPS_SpatialTransformerNetwork
 from futrextr import ResNet_FeatureExtractor
 from mdlseq import BidirectionalLSTM
 from dictpred import Attention
-from dtst import MyAlignCollate
 import torch
 
-# from cfour import AlignCollate_demo 
-AlignCollate_demo = MyAlignCollate(imgH=32, imgW=100, keep_ratio_with_pad=False)
+
 class Model(nn.Module):
 
     def __init__(self):
@@ -32,18 +30,14 @@ class Model(nn.Module):
             BidirectionalLSTM(256, 256, 256))
         self.SequenceModeling_output = 256
 
-
         """ Prediction """
         self.Prediction = Attention(self.SequenceModeling_output, 256, 96)
 
     def forward(self, input):
         """ Transformation stage """
-        # print(input)
-        # print("In Model input: ",input.shape)
-        # print("In Model text: ",text.shape)
-        # input = AlignCollate_demo(input)
-        # is_train = False
-        text=torch.zeros(1, 12,dtype=torch.float64)
+
+        text = torch.zeros(1, 12, dtype=torch.float64)
+
         if not self.stages['Trans'] == "None":
             input = self.Transformation(input)
 
@@ -57,7 +51,7 @@ class Model(nn.Module):
             contextual_feature = self.SequenceModeling(visual_feature)
         else:
             contextual_feature = visual_feature  # for convenience. this is NOT contextually modeled by BiLSTM
-        # print(contextual_feature.shape)
+
         """ Prediction stage """
         if self.stages['Pred'] == 'CTC':
             prediction = self.Prediction(contextual_feature.contiguous())

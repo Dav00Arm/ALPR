@@ -1,8 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-
+from configs.general import general_configs
 
 class Attention(nn.Module):
 
@@ -17,7 +16,7 @@ class Attention(nn.Module):
         # print(input_char.shape)
         input_char = input_char.unsqueeze(1)
         batch_size = input_char.size(0)
-        one_hot = torch.FloatTensor(batch_size, onehot_dim).zero_().to(device)
+        one_hot = torch.FloatTensor(batch_size, onehot_dim).zero_().to(general_configs['device'])
         one_hot = one_hot.scatter_(1, input_char, 1)
         return one_hot
 
@@ -31,9 +30,9 @@ class Attention(nn.Module):
         batch_size = batch_H.size(0)
         num_steps = batch_max_length + 1  # +1 for [s] at end of sentence.
 
-        output_hiddens = torch.FloatTensor(batch_size, num_steps, self.hidden_size).fill_(0).to(device)
-        hidden = (torch.FloatTensor(batch_size, self.hidden_size).fill_(0).to(device),
-                  torch.FloatTensor(batch_size, self.hidden_size).fill_(0).to(device))
+        output_hiddens = torch.FloatTensor(batch_size, num_steps, self.hidden_size).fill_(0).to(general_configs['device'])
+        hidden = (torch.FloatTensor(batch_size, self.hidden_size).fill_(0).to(general_configs['device']),
+                  torch.FloatTensor(batch_size, self.hidden_size).fill_(0).to(general_configs['device']))
 
         # if is_train:
         #     for i in range(num_steps):
@@ -45,9 +44,9 @@ class Attention(nn.Module):
         #     probs = self.generator(output_hiddens)
 
         # else:
-        targets = torch.LongTensor(1).fill_(0).to(device)  # [GO] token
-        probs = torch.FloatTensor(1, num_steps, self.num_classes).fill_(0).to(device)
-        print("False")
+        targets = torch.LongTensor(1).fill_(0).to(general_configs['device'])  # [GO] token
+        probs = torch.FloatTensor(1, num_steps, self.num_classes).fill_(0).to(general_configs['device'])
+
         for i in range(num_steps):
             char_onehots = self._char_to_onehot(targets, onehot_dim=self.num_classes)
             hidden, alpha = self.attention_cell(hidden, batch_H, char_onehots)

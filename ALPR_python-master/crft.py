@@ -79,7 +79,7 @@ class CRAFT(nn.Module):
 
         return y.permute(0,2,3,1), feature
 
+
 if __name__ == '__main__':
     model = CRAFT(pretrained=False).cuda()
     output, _ = model(torch.randn(1, 3, 256, 256).cuda())
-    # print(output.shape)
