@@ -23,6 +23,8 @@ from shapely.geometry import Polygon
 import cv2
 from datetime import datetime
 from configs.general import main_configs, draw_configs, camera_configs, barrier_configs
+from configs.model_configs import car_det_configs
+from car_color_classifier import CarColorClassifier
 from dtsnd import request_to_barrier
 from getmac import get_mac_address as gma
 
@@ -179,17 +181,19 @@ if __name__ == '__main__':
                 colors = [cmap(i)[:3] for i in np.linspace(0, 1, 20)]
                 boxs = np.array([d.tlwh for d in detections])
                 scores = np.array([d.confidence for d in detections])
-                classes = np.array([d.class_name for d in detections])
+                classes = np.array([d.class_name.to('cpu') for d in detections])
                 indices = prcsng.non_max_suppression(boxs, classes, main_configs['nms_max_overlap'], scores)
                 detections = [detections[i] for i in indices]
                 trackers[cam_id].predict()
                 trackers[cam_id].update(detections)
                 cam_images = {}
-                ids = []
+                labels = {}
                 boxes = []
                 for track in trackers[cam_id].tracks:
                     if not track.is_confirmed() or track.time_since_update > 1:
                         continue
+
+                    label = track.get_class().item()
                     bbox = track.to_tlbr()
                     color = colors[int(track.track_id) % len(colors)]
                     color = [i * 255 for i in color]
@@ -200,11 +204,15 @@ if __name__ == '__main__':
                     y_max = int(min(bbox[3], maximum_y))
                     boxes.append([(int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3]))])
                     cam_images[track.track_id] = frames[cam_id][y_min: y_max, x_min: x_max]
-                    ids.append(track.track_id)
+                    labels[track.track_id] = label
 
                 out, car_ids = detect_plate_onnx_id(cam_images, car_boxes=boxes)
 
-                spot_dict, last_ids, current_spot_dict = check_box(spots[cam_id], out, last_ids)
+                spot_dict, last_ids, current_spot_dict, car_ind_dict = check_box(spots[cam_id], out, last_ids)
+
+                color_classifier = CarColorClassifier()
+                car_colors_dict = color_classifier(cam_images, car_ind_dict)
+
                 for key, value in current_spot_dict.items():
                     status[cam_id][key] = value
                     if len(changed) > 0:
@@ -248,16 +256,19 @@ if __name__ == '__main__':
                                 date_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                                 prediction, conf = test_ocr(res)
                                 prediction = NumberProcess(prediction)
+                                cls = labels[car_ind_dict[spot_id]]
+                                label = car_det_configs['class_names'][cls]
+                                color = car_colors_dict[spot_id]
                                 if len(prediction) <= 3 or (len(prediction) == 4 and prediction[-2].isalpha()) or (
                                         len(prediction) == 6 and prediction[-2].isnumeric()):
                                     last_ids[spot_id] = -1
                                 elif (prediction != last_ln[cam_id][spot_id]) and (
                                         conf >= main_configs['ocr_conf_threshold']):# and (prediction not in wl):
                                     # if pix > 10:
-                                    responses[cam_id][spot_id] = True#send_data(cam_images[last_ids[spot_id]], img, cam_id, prediction, date_time, conf, spot_id)
+                                    responses[cam_id][spot_id] = True  # send_data(cam_images[last_ids[spot_id]], img, cam_id, prediction, date_time, conf, spot_id)
 
-                                    print("FINAL:", prediction, conf)
-                                    request_to_barrier(barrier_configs['barrier_open_url'])
+                                    print("FINAL:", prediction, conf, label, color)
+                                    # request_to_barrier(barrier_configs['barrier_open_url'])
 
                                     last_ln[cam_id][spot_id] = prediction
 

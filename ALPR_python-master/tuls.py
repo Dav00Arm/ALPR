@@ -141,6 +141,7 @@ def get_centre(box):
 def check_box(spots, all_coordinates, last_ids):
     spot_dict = {}
     current_spot_dict = {}
+    car_ind_dict = {}
     for s in range(len(spots)):
         current_spot_dict[s] = 'Free'
     for idx, info in all_coordinates.items():
@@ -151,14 +152,12 @@ def check_box(spots, all_coordinates, last_ids):
             for i, spot in enumerate(spots):
                 if spot.contains(plate_pol):
                     current_spot_dict[i] = 'Busy'
-                if last_ids[i] == -1:
-                    if spot.contains(plate_pol):
+                    if last_ids[i] == -1 or idx != last_ids[i]:
                         spot_dict[i] = img[j]
                         last_ids[i] = idx
-                elif spot.contains(plate_pol) and idx != last_ids[i]:
-                    spot_dict[i] = img[j]
-                    last_ids[i] = idx
-    return spot_dict, last_ids, current_spot_dict
+                        car_ind_dict[i] = idx
+
+    return spot_dict, last_ids, current_spot_dict, car_ind_dict
 
 
 def draw_plate(img, out):

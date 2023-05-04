@@ -56,7 +56,7 @@ def test_ocr(lines):
 
     conf = conf/len(lines) if len(lines) > 0 else 0
 
-    print(plate)
+    # print(plate)
 
     return plate, int(conf*100)
 

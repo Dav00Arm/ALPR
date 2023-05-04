@@ -79,6 +79,5 @@ general_configs = {
 nms_configs = {
     'conf_thres': 0.4,
     'iou_thres': 0.5,
-    'classes': [2, 3, 5, 7],
     'max_det': 100
 }

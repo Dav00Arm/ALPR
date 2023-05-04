@@ -42,7 +42,7 @@ def car_detection_yolo_one_id(images,
 
         # NMS
         detections = non_max_suppression(
-            detections, nms_configs['conf_thres'], nms_configs['iou_thres'], nms_configs['classes'],
+            detections, nms_configs['conf_thres'], nms_configs['iou_thres'], car_det_configs['class_ids'],
             max_det=nms_configs['max_det']
         )
 
@@ -61,7 +61,7 @@ def car_detection_yolo_one_id(images,
 
                     out.append(img)
                     draw_boxes.append([(int(xyxy[0]), int(xyxy[1])), (int(xyxy[2]), int(xyxy[3]))])
-                    classes.append(0)
+                    classes.append(cls)
                     confs.append(conf)
 
     return out, draw_boxes, confs, classes

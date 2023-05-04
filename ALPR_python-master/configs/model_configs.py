@@ -19,6 +19,13 @@ imgsz = check_img_size((320, 320), s=stride)
 
 car_det_configs = {
     'car_detection_model': car_detection_model,
+    'class_ids': [2, 3, 5, 7],
+    'class_names': {
+        2: 'car',
+        3: 'motorcycle',
+        5: 'bus',
+        7: 'truck'
+    },
     'stride': stride,
     'pt': pt,
     'imgsz': imgsz
