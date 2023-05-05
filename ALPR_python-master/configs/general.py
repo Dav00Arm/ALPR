@@ -10,7 +10,8 @@ main_configs = {
     'wl_path': 'ALPR_python-master/whiteList.txt',
     'nn_distance_metric': 'cosine',
     'batch_size': 8,
-    'ocr_conf_threshold': 97
+    'ocr_conf_threshold': 97,
+    'request_timeout': 3
 }
 
 barrier_configs = {
@@ -28,10 +29,10 @@ draw_configs = {
     'time_font_scale': 0.8,
     'time_font_color': (0, 0, 0),
     'time_font_thickness': 2,
-    'status_line_color': (0, 0, 255),
-    'status_line_thickness': 2,
-    'status_busy_color': (0, 0, 255),
-    'status_free_color': (255, 0, 0),
+    # 'status_line_color': (0, 0, 255),
+    # 'status_line_thickness': 2,
+    # 'status_busy_color': (0, 0, 255),
+    # 'status_free_color': (255, 0, 0),
     'plate_color': (0, 255, 0),
     'plate_thickness': 2,
     'plate_font_scale': 0.75,

@@ -49,14 +49,6 @@ def send_data(car_image, plate_image, cam_id, prediction, date_time, conf, spot_
         return False
 
 
-def check_change(current_status, prev_status):
-    if len(prev_status):
-        for key, value in current_status.items():
-            if prev_status[key] == 'Busy' and value == 'Free':
-                return True
-    return False
-
-
 def load_whiteList(path):
     wl = []
     with open(path, 'r') as f:
@@ -140,24 +132,19 @@ def get_centre(box):
 
 def check_box(spots, all_coordinates, last_ids):
     spot_dict = {}
-    current_spot_dict = {}
     car_ind_dict = {}
-    for s in range(len(spots)):
-        current_spot_dict[s] = 'Free'
     for idx, info in all_coordinates.items():
         img, _, boxes = info[0], info[1], info[2]
         for j, b in enumerate(boxes):
             plate_pol = convert_polygon(b)
 
             for i, spot in enumerate(spots):
-                if spot.contains(plate_pol):
-                    current_spot_dict[i] = 'Busy'
-                    if last_ids[i] == -1 or idx != last_ids[i]:
-                        spot_dict[i] = img[j]
-                        last_ids[i] = idx
-                        car_ind_dict[i] = idx
+                if spot.contains(plate_pol) and (last_ids[i] == -1 or idx != last_ids[i]):
+                    spot_dict[i] = img[j]
+                    last_ids[i] = idx
+                    car_ind_dict[i] = idx
 
-    return spot_dict, last_ids, current_spot_dict, car_ind_dict
+    return spot_dict, last_ids, car_ind_dict
 
 
 def draw_plate(img, out):

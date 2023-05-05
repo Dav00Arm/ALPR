@@ -85,10 +85,6 @@ if __name__ == '__main__':
     last_idss = []
     spots = []
     responses = []
-    status = []
-    fix_times = []
-    changed = {}
-    changed_free = {}
     last_ln = []
     emergency_stop = False
     # if mc_address[0] != gma():
@@ -111,27 +107,22 @@ if __name__ == '__main__':
         trackers.append(Tracker(metrices[j]))
         encoders.append(gdet.create_box_encoder(main_configs['model_filename'], batch_size=main_configs['batch_size']))
         spots.append([])
-        status.append([])
-        fix_times.append([])
         last_ln.append([])
         responses.append([])
         for k, bbbox2 in enumerate(bbbox1):
             x1y1, x2y2, x3y3, x4y4 = [i for i in bbbox2]
             spots[j].append(Polygon([x1y1, x2y2, x3y3, x4y4]))
             responses[j].append(False)
-            status[j].append(None)
-            fix_times[j].append(0)
             last_ln[j].append(None)
 
         last_idss.append(np.negative(np.ones((len(spots[j])))))
 
     counter = 0
     do_update = True
-    prev_status = deepcopy(status)
-    prev_changed = {}
     start_time = time.time()
     start = time.time()
     wait_time = 0
+    last_req_time = 0
     while True:
         for frames in zip(*video_captures):
             do_break = False
@@ -208,42 +199,10 @@ if __name__ == '__main__':
 
                 out, car_ids = detect_plate_onnx_id(cam_images, car_boxes=boxes)
 
-                spot_dict, last_ids, current_spot_dict, car_ind_dict = check_box(spots[cam_id], out, last_ids)
+                spot_dict, last_ids, car_ind_dict = check_box(spots[cam_id], out, last_ids)
 
                 color_classifier = CarColorClassifier()
                 car_colors_dict = color_classifier(cam_images, car_ind_dict)
-
-                for key, value in current_spot_dict.items():
-                    status[cam_id][key] = value
-                    if len(changed) > 0:
-                        if changed[f'{cam_id}_{key}'] == 'Busy':
-                            cv2.line(ill_frames[cam_id], bbboxes[cam_id][key][1], bbboxes[cam_id][key][2],
-                                     draw_configs['status_line_color'], thickness=draw_configs['status_line_thickness'])
-                            cv2.line(ill_frames[cam_id], bbboxes[cam_id][key][0], bbboxes[cam_id][key][1],
-                                     draw_configs['status_line_color'], thickness=draw_configs['status_line_thickness'])
-                            cv2.line(ill_frames[cam_id], bbboxes[cam_id][key][2], bbboxes[cam_id][key][3],
-                                     draw_configs['status_line_color'], thickness=draw_configs['status_line_thickness'])
-                            cv2.line(ill_frames[cam_id], bbboxes[cam_id][key][3], bbboxes[cam_id][key][0],
-                                     draw_configs['status_line_color'], thickness=draw_configs['status_line_thickness'])
-
-                if prev_status != status:
-                    for spots_i in range(len(status)):
-                        for spot_i in range(len(status[spots_i])):
-                            if prev_status[spots_i][spot_i] == 'Busy' and status[spots_i][spot_i] == 'Free':
-                                fix_times[spots_i][spot_i] = time.time()
-                            elif prev_status[spots_i][spot_i] == 'Free' and status[spots_i][spot_i] == 'Busy':
-                                fix_times[spots_i][spot_i] = -1
-                    prev_status = deepcopy(status)
-
-                for spot_times in range(len(fix_times)):
-                    for spot_time in range(len(fix_times[spot_times])):
-                        if fix_times[spot_times][spot_time] == -1:
-                            changed[f'{spot_times}_{spot_time}'] = 'Busy'
-                            color = draw_configs['status_busy_color']
-
-                        elif time.time() - fix_times[spot_times][spot_time] - wait_time > 10:
-                            changed[f'{spot_times}_{spot_time}'] = 'Free'
-                            color = draw_configs['status_free_color']
 
                 draw_plate(ill_frames[cam_id], out)
                 for spot_id, img in spot_dict.items():
@@ -262,51 +221,22 @@ if __name__ == '__main__':
                                 if len(prediction) <= 3 or (len(prediction) == 4 and prediction[-2].isalpha()) or (
                                         len(prediction) == 6 and prediction[-2].isnumeric()):
                                     last_ids[spot_id] = -1
-                                elif (prediction != last_ln[cam_id][spot_id]) and (
-                                        conf >= main_configs['ocr_conf_threshold']):# and (prediction not in wl):
-                                    # if pix > 10:
+                                elif conf >= main_configs['ocr_conf_threshold']:  # prediction != last_ln[cam_id][spot_id]
                                     responses[cam_id][spot_id] = True  # send_data(cam_images[last_ids[spot_id]], img, cam_id, prediction, date_time, conf, spot_id)
 
                                     print("FINAL:", prediction, conf, label, color)
-                                    # request_to_barrier(barrier_configs['barrier_open_url'])
+                                    if last_req_time == 0 or time.time() - last_req_time >= main_configs['request_timeout']:
+                                        print('Requesting')
+                                        # request_to_barrier(barrier_configs['barrier_open_url'])
+                                        last_req_time = time.time()
+                                    else:
+                                        print('Dont send request')
 
                                     last_ln[cam_id][spot_id] = prediction
 
                                 elif conf < main_configs['ocr_conf_threshold']:
-                                    # print(prediction)
                                     last_ids[spot_id] = -1
             wait_time = 0
-            if prev_changed != changed:
-                frees = {}
-                frees_spot = {}
-                for key, _ in changed.items():
-                    if changed[key] == 'Free':
-                        if len(prev_changed) > 0 and (prev_changed[key] != 'Free' and responses[int(key.split('_')[0])][int(key.split('_')[1])]):
-                            frees['mac_address'] = camera_configs['mac_addresses'][int(key.split('_')[0])]
-                            frees_spot[int(key.split('_')[1])] = 'Free'
-                            frees['time'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-                            frees['spot'] = frees_spot
-                            # print(frees)
-                            # if pix > 10:
-                            # post_data(locator_url, frees, name='places')
-                            changed_free[key] = 0
-                            responses[int(key.split('_')[0])][int(key.split('_')[1])] = False
-
-                        if len(prev_changed) == 0:
-                            # print(status)
-                            if status[int(key.split('_')[0])][int(key.split('_')[1])] == 'Free':
-                                frees['mac_address'] = camera_configs['mac_addresses'][int(key.split('_')[0])]
-                                frees_spot[int(key.split('_')[1])] = 'Free'
-                                frees['time'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-                                frees['spot'] = frees_spot
-                                # print(frees)
-                                # if pix > 10:
-                                # post_data(locator_url, frees, name='places')
-                                changed_free[key] = 0
-                                responses[int(key.split('_')[0])][int(key.split('_')[1])] = False
-
-                prev_changed = deepcopy(changed)
-            # print("Inference time",time.time() - dv)
             out_frame = show_images(ill_frames, width, height)
             cv2.imshow("Image", out_frame)
 
