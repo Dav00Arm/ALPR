@@ -230,7 +230,7 @@ if __name__ == '__main__':
                                         # request_to_barrier(barrier_configs['barrier_open_url'])
                                         last_req_time = time.time()
                                     else:
-                                        print('Dont send request')
+                                        print("Can't send request, need timeout")
 
                                     last_ln[cam_id][spot_id] = prediction
 
