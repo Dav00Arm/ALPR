@@ -213,5 +213,3 @@ def main():
                         args.detection_dir)
 
 
-if __name__ == "__main__":
-    main()
