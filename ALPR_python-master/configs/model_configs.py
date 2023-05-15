@@ -10,7 +10,7 @@ from vslite import create_mobilenetv2_ssd_lite_predictor
 from configs.general import general_configs
 
 """Car detection"""
-car_detection_weights = "./models/yolov5n_cpu.onnx"# if general_configs['device'].type == 'cpu' else "../models/yolov5n_gpu.onnx"
+car_detection_weights = "ALPR_python-master/models/yolov5n_cpu.onnx"# if general_configs['device'].type == 'cpu' else "../models/yolov5n_gpu.onnx"
 car_detection_model = DetectMultiBackend(
     weights=decrypt_file(load_graph(car_detection_weights), general_configs['_key']), device=general_configs['device']
 )
@@ -32,7 +32,7 @@ car_det_configs = {
 }
 
 """Plate detection"""
-plate_detection_weights = "../models/plate_detection_cpu.onnx" #if general_configs['device'].type == 'cpu' else "../models/plate_detection_gpu.onnx"
+plate_detection_weights = "ALPR_python-master/models/plate_detection_cpu.onnx" #if general_configs['device'].type == 'cpu' else "../models/plate_detection_gpu.onnx"
 sess_plate = ort.InferenceSession(decrypt_file(load_graph(plate_detection_weights), general_configs['_key']), providers=['CPUExecutionProvider' if general_configs['device'].type == 'cpu' else 'CUDAExecutionProvider'])
 plate_detection_model = create_mobilenetv2_ssd_lite_predictor(sess_plate, candidate_size=200, onnx=True, device=general_configs['device'])
 
@@ -42,7 +42,7 @@ plate_det_configs = {
 }
 
 """Craft"""
-craft_weights = "../models/craft_cpu.onnx" #if general_configs['device'].type == 'cpu' else "../models/craft_gpu.onnx"
+craft_weights = "ALPR_python-master/models/craft_cpu.onnx" #if general_configs['device'].type == 'cpu' else "../models/craft_gpu.onnx"
 craft_model = ort.InferenceSession(decrypt_file(load_graph(craft_weights), general_configs['_key']), providers=['CPUExecutionProvider' if general_configs['device'].type == 'cpu' else 'CUDAExecutionProvider'])
 
 craft_configs = {
@@ -55,7 +55,7 @@ craft_configs = {
 }
 
 """Refiner"""
-refiner_weights = "../models/refiner_cpu.onnx"# if general_configs['device'].type == 'cpu' else "../models/refiner_gpu.onnx"
+refiner_weights = "ALPR_python-master/models/refiner_cpu.onnx"# if general_configs['device'].type == 'cpu' else "../models/refiner_gpu.onnx"
 refine_net_model = ort.InferenceSession(decrypt_file(load_graph(refiner_weights), general_configs['_key']), providers=['CPUExecutionProvider' if general_configs['device'].type == 'cpu' else 'CUDAExecutionProvider'])
 # cr_rf_params = params_craft_refiner(craft_model, refine_net_model)
 
@@ -71,10 +71,10 @@ refiner_configs = {
 character = string.printable[:-6]
 
 plate_rec_configs = {
-    'plate_recognition_weights': '../models/ocr(PN).pth',
+    'plate_recognition_weights': 'ALPR_python-master/models/ocr(PN).pth',
     'batch_max_length': 11,
     'converter': AttnLabelConverter(character),
-    'plate_recognition_model': torch.jit.load('../models/ocr(PN).pt').to('cpu'),
+    'plate_recognition_model': torch.jit.load('ALPR_python-master/models/ocr(PN).pt').to('cpu'),
     'AlignCollate_demo': MyAlignCollate(imgH=32, imgW=100, keep_ratio_with_pad=False),
     'mc_address': ['40:8d:5c:c2:9b:55']
 }
