@@ -20,12 +20,12 @@ if str(ROOT) not in sys.path:
 if platform.system() != 'Windows':
     ROOT = Path(os.path.relpath(ROOT, Path.cwd()))  # relative
 
-from expr import attempt_load
-from pklp import Detect
-from dldrs import LoadImages
-from genr import (LOGGER, check_dataset, check_img_size, check_requirements, check_version, colorstr,
+from yolo_experimental import attempt_load
+from yolo_specific_modules import Detect
+from yolo_dataloader import LoadImages
+from yolo_general_utils import (LOGGER, check_dataset, check_img_size, check_requirements, check_version, colorstr,
                            file_size, print_args, url2file)
-from trchutl import select_device
+from yolo_torch_utils import select_device
 
 
 def export_formats():

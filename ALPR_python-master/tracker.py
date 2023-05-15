@@ -1,10 +1,10 @@
 # vim: expandtab:ts=4:sw=4
 from __future__ import absolute_import
 import numpy as np
-import namlakfltr
-import linassig
-import ichmatch
-from trck import Track
+import tracker_kalman_filter
+import tracker_metrics
+import tracker_iou
+from track import Track
 
 
 class Tracker:
@@ -43,7 +43,7 @@ class Tracker:
         self.max_age = max_age
         self.n_init = n_init
 
-        self.kf = namlakfltr.KalmanFilter()
+        self.kf = tracker_kalman_filter.KalmanFilter()
         self.tracks = []
         self._next_id = 1
 
@@ -98,7 +98,7 @@ class Tracker:
             targets = np.array([tracks[i].track_id for i in track_indices])
             cost_matrix = self.metric.distance(features, targets)
            
-            cost_matrix = linassig.gate_cost_matrix(
+            cost_matrix = tracker_metrics.gate_cost_matrix(
                 self.kf, cost_matrix, tracks, dets, track_indices,
                 detection_indices)
 
@@ -112,7 +112,7 @@ class Tracker:
 
         # Associate confirmed tracks using appearance features.
         matches_a, unmatched_tracks_a, unmatched_detections = \
-            linassig.matching_cascade(
+            tracker_metrics.matching_cascade(
                 gated_metric, self.metric.matching_threshold, self.max_age,
                 self.tracks, detections, confirmed_tracks)
 
@@ -125,8 +125,8 @@ class Tracker:
             self.tracks[k].time_since_update != 1]
         # print(cost_matrix)
         matches_b, unmatched_tracks_b, unmatched_detections = \
-            linassig.min_cost_matching(
-                ichmatch.iou_cost, self.max_iou_distance, self.tracks,
+            tracker_metrics.min_cost_matching(
+                tracker_iou.iou_cost, self.max_iou_distance, self.tracks,
                 detections, iou_track_candidates, unmatched_detections)
 
         matches = matches_a + matches_b

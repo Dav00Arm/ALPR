@@ -14,13 +14,13 @@ import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import seaborn as sn
+# import seaborn as sn
 import torch
 from PIL import Image, ImageDraw, ImageFont
 
-from genr import (CONFIG_DIR, FONT, LOGGER, Timeout, check_font, check_requirements, clip_coords,
+from yolo_general_utils import (CONFIG_DIR, FONT, LOGGER, Timeout, check_font, check_requirements, clip_coords,
                            increment_path, is_ascii, threaded, try_except, xywh2xyxy, xyxy2xywh)
-from mtrc import fitness
+from yolo_metrics import fitness
 
 # Settings
 RANK = int(os.getenv('RANK', -1))
@@ -317,7 +317,7 @@ def plot_labels(labels, names=(), save_dir=Path('')):
     x = pd.DataFrame(b.transpose(), columns=['x', 'y', 'width', 'height'])
 
     # seaborn correlogram
-    sn.pairplot(x, corner=True, diag_kind='auto', kind='hist', diag_kws=dict(bins=50), plot_kws=dict(pmax=0.9))
+    # sn.pairplot(x, corner=True, diag_kind='auto', kind='hist', diag_kws=dict(bins=50), plot_kws=dict(pmax=0.9))
     plt.savefig(save_dir / 'labels_correlogram.jpg', dpi=200)
     plt.close()
 
@@ -335,8 +335,8 @@ def plot_labels(labels, names=(), save_dir=Path('')):
         ax[0].set_xticklabels(names, rotation=90, fontsize=10)
     else:
         ax[0].set_xlabel('classes')
-    sn.histplot(x, x='x', y='y', ax=ax[2], bins=50, pmax=0.9)
-    sn.histplot(x, x='width', y='height', ax=ax[3], bins=50, pmax=0.9)
+    # sn.histplot(x, x='x', y='y', ax=ax[2], bins=50, pmax=0.9)
+    # sn.histplot(x, x='width', y='height', ax=ax[3], bins=50, pmax=0.9)
 
     # rectangles
     labels[:, 1:3] = 0.5  # center

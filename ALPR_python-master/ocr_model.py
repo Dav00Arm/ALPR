@@ -1,8 +1,8 @@
 import torch.nn as nn
-from trnsfrmkl import TPS_SpatialTransformerNetwork
-from futrextr import ResNet_FeatureExtractor
-from mdlseq import BidirectionalLSTM
-from dictpred import Attention
+from ocr_TPS import TPS_SpatialTransformerNetwork
+from ocr_feature_extractor import ResNet_FeatureExtractor
+from ocr_BLSTM import BidirectionalLSTM
+from ocr_attention import Attention
 import torch
 
 

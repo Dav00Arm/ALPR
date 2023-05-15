@@ -3,8 +3,8 @@ from torch.nn import Conv2d, Sequential, ModuleList, BatchNorm2d
 from torch import nn
 from v2 import MobileNetV2, InvertedResidual
 
-from dse import SSD, GraphPath
-from prdctr import Predictor, Predictor_ONNX
+from plate_detection_ssd import SSD, GraphPath
+from plate_predictor import Predictor, Predictor_ONNX
 import v1lite as config
 from configs.general import general_configs
 

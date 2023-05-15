@@ -1,9 +1,9 @@
 import torch
 import numpy as np
 import torch.backends.cudnn as cudnn
-from aug import letterbox
-from genr import non_max_suppression, scale_coords
-from pslt import box_crop
+from augmentations import letterbox
+from yolo_general_utils import non_max_suppression, scale_coords
+from yolo_plotting_utils import box_crop
 from configs.model_configs import car_det_configs
 from configs.general import general_configs, nms_configs
 cudnn.benchmark = True

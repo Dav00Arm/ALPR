@@ -4,7 +4,7 @@ import cv2
 import pandas as pd
 import torch
 import numpy as np
-from dtsnd import post_data
+from send_data import post_data
 import time
 from shapely.geometry import Polygon
 from configs.general import user_configs, camera_configs, draw_configs

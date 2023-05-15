@@ -1,6 +1,6 @@
 import numpy as np
 #ssd.vision.
-from bu import SSDSpec, SSDBoxSizes, generate_ssd_priors
+from craft_processors import SSDSpec, SSDBoxSizes, generate_ssd_priors
 
 
 image_size = 300

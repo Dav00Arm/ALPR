@@ -1,4 +1,4 @@
-from wqsd import *
+from augmentation_utils import *
 import torch 
 
 class TrainAugmentation:

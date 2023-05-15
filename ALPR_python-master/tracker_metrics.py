@@ -2,7 +2,7 @@
 from __future__ import absolute_import
 import numpy as np
 from scipy.optimize import linear_sum_assignment
-import namlakfltr
+import tracker_kalman_filter
 
 
 INFTY_COST = 1e+5
@@ -180,7 +180,7 @@ def gate_cost_matrix(
 
     """
     gating_dim = 2 if only_position else 4
-    gating_threshold = namlakfltr.chi2inv95[gating_dim]
+    gating_threshold = tracker_kalman_filter.chi2inv95[gating_dim]
     measurements = np.asarray(
         [detections[i].to_xyah() for i in detection_indices])
     for row, track_idx in enumerate(track_indices):

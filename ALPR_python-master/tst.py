@@ -694,7 +694,7 @@
 # import numpy as np
 # Convert_ONNX(plate_recognition_model.module,example)
 
-from csm import VideoCaptureThreading
+from VideoCapture import VideoCaptureThreading
 import cv2
 video_captures = []
 cap = VideoCaptureThreading(0)

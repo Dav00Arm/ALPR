@@ -4,31 +4,31 @@ from torch.autograd import Variable
 from PIL import Image
 import cv2
 import numpy as np
-import crftut
-import iprmg
-from tuls import params_craft_refiner
+import craft_utils
+import craft_normalize
+from utils import params_craft_refiner
 from configs.model_configs import craft_configs, refiner_configs
 
 
 def craft_preprocess(image,canvas_size=100):
-    img_resized, ratio_h,ratio_w = iprmg.resize_aspect_ratio(image, canvas_size, interpolation=cv2.INTER_LINEAR, mag_ratio=1)
+    img_resized, ratio_h,ratio_w = craft_normalize.resize_aspect_ratio(image, canvas_size, interpolation=cv2.INTER_LINEAR, mag_ratio=1)
     img_resized = cv2.resize(image,( canvas_size, canvas_size),cv2.INTER_AREA)
     ratio_h = 1 / ratio_h
     ratio_w = 1 / ratio_w
 
     # preprocessing
-    x = iprmg.normalizeMeanVariance(img_resized)
+    x = craft_normalize.normalizeMeanVariance(img_resized)
     x = torch.from_numpy(x).permute(2, 0, 1)    # [h, w, c] to [c, h, w]
     x = Variable(x.unsqueeze(0))  
     return x, ratio_h, ratio_w
 
 
 def get_boxes(score_text, score_link, text_threshold, link_threshold, low_text, poly, ratio_w, ratio_h):
-    boxes, polys = crftut.getDetBoxes(score_text, score_link, text_threshold, link_threshold, low_text, poly)
+    boxes, polys = craft_utils.getDetBoxes(score_text, score_link, text_threshold, link_threshold, low_text, poly)
 
     # coordinate adjustment
-    boxes = crftut.adjustResultCoordinates(boxes, ratio_w, ratio_h)
-    polys = crftut.adjustResultCoordinates(polys, ratio_w, ratio_h)
+    boxes = craft_utils.adjustResultCoordinates(boxes, ratio_w, ratio_h)
+    polys = craft_utils.adjustResultCoordinates(polys, ratio_w, ratio_h)
     for k in range(len(polys)):
         if polys[k] is None:
             polys[k] = boxes[k]

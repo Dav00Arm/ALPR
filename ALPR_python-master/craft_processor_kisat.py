@@ -1,4 +1,4 @@
-from .bu import SSDSpec
+from .craft_processors import SSDSpec
 
 from typing import List
 import itertools

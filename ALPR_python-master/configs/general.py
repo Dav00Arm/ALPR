@@ -5,9 +5,9 @@ main_configs = {
     'max_cosine_distance': 0.5,
     'nn_budget': None,
     'nms_max_overlap': 1.0,
-    'model_filename': 'ALPR_python-master/deepsort_models/mars-small128.pb',
+    'model_filename': 'deepsort_models/mars-small128.pb',
     'spot_config': 'spot_config.json',
-    'wl_path': 'ALPR_python-master/whiteList.txt',
+    'wl_path': 'whiteList.txt',
     'nn_distance_metric': 'cosine',
     'batch_size': 8,
     'ocr_conf_threshold': 97,
@@ -69,7 +69,7 @@ camera_configs = {
     'locator_url': 'https://gaz.locator.am/api/camera_info'
 }
 
-user_configs = yaml.safe_load(open("ALPR_python-master/user_config.yaml", "r"))
+user_configs = yaml.safe_load(open("user_config.yaml", "r"))
 
 general_configs = {
     'device': torch.device('cuda' if torch.cuda.is_available() else 'cpu'),

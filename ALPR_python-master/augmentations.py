@@ -9,8 +9,8 @@ import random
 import cv2
 import numpy as np
 
-from genr import LOGGER, check_version, colorstr, resample_segments, segment2box
-from mtrc import bbox_ioa
+from yolo_general_utils import LOGGER, check_version, colorstr, resample_segments, segment2box
+from yolo_metrics import bbox_ioa
 
 
 class Albumentations:

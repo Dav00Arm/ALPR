@@ -5,16 +5,16 @@ import torch
 
 import string
 # from vslite import create_mobilenetv2_ssd_lite_predictor
-from utllscr import AttnLabelConverter
-from mdl import Model
+from ocr_CTC import AttnLabelConverter
+from ocr_model import Model
 from configs.general import general_configs
 
-from dtst import MyAlignCollate
-# from cmn import DetectMultiBackend
+from ocr_dataset import MyAlignCollate
+# from yolo_common import DetectMultiBackend
 
-# from genr import check_img_size
-# from dtsnd import get_mac
-from gtmdls import decrypt_file, load_graph
+# from yolo_general_utils import check_img_size
+# from send_data import get_mac
+from models_decrypt import decrypt_file, load_graph
 
 import io
 from datetime import datetime

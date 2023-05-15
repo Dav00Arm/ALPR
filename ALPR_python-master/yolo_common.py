@@ -20,11 +20,11 @@ import yaml
 from PIL import Image
 from torch.cuda import amp
 
-from dldrs import exif_transpose, letterbox
-from genr import (LOGGER, check_requirements, check_suffix, check_version, colorstr, increment_path,
+from yolo_dataloader import exif_transpose, letterbox
+from yolo_general_utils import (LOGGER, check_requirements, check_suffix, check_version, colorstr, increment_path,
                            make_divisible, non_max_suppression, scale_coords, xywh2xyxy, xyxy2xywh)
-from pslt import Annotator, colors, save_one_box
-from trchutl import copy_attr, time_sync
+from yolo_plotting_utils import Annotator, colors, save_one_box
+from yolo_torch_utils import copy_attr, time_sync
 from configs.general import general_configs
 
 
@@ -267,7 +267,7 @@ class DetectMultiBackend(nn.Module):
     # YOLOv5 MultiBackend class for python inference on various backends
     def __init__(self, weights='yolov5s.pt', device=general_configs['device'], dnn=False, data=None, fp16=False):
 
-        from expr import attempt_download, attempt_load  # scoped to avoid circular import
+        from yolo_experimental import attempt_download, attempt_load  # scoped to avoid circular import
 
         super().__init__()
         pt, jit, onnx, xml, engine, coreml, saved_model, pb, tflite, edgetpu, tfjs = False, False, True, False, False, False, False, False, False, False, False   # get backend
@@ -356,7 +356,7 @@ class DetectMultiBackend(nn.Module):
     @staticmethod
     def model_type(p='path/to/model.pt'):
         # Return model type from model path, i.e. path='path/to/model.onnx' -> type=onnx
-        from pexrt import export_formats
+        from yolo_exports import export_formats
         suffixes = list(export_formats().Suffix) + ['.xml']  # export suffixes
         check_suffix(p, suffixes)  # checks
         p = Path(p).name  # eliminate trailing separators

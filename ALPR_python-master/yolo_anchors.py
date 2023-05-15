@@ -10,7 +10,7 @@ import torch
 import yaml
 from tqdm import tqdm
 
-from genr import LOGGER, colorstr, emojis
+from yolo_general_utils import LOGGER, colorstr, emojis
 
 PREFIX = colorstr('AutoAnchor: ')
 
@@ -113,7 +113,7 @@ def kmean_anchors(dataset='./data/coco128.yaml', n=9, img_size=640, thr=4.0, gen
     if isinstance(dataset, str):  # *.yaml file
         with open(dataset, errors='ignore') as f:
             data_dict = yaml.safe_load(f)  # model dict
-        from .dldrs import LoadImagesAndLabels
+        from .yolo_dataloader import LoadImagesAndLabels
         dataset = LoadImagesAndLabels(data_dict['train'], augment=True, rect=True)
 
     # Get label wh

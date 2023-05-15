@@ -1,8 +1,8 @@
 import torch
 import numpy as np
-import bu
-from dproc import PredictionTransform
-from pltdtmsc import Timer
+import craft_processors
+from craft_augmentations import PredictionTransform
+from timer_checkpoints import Timer
 from configs.general import general_configs
 
 
@@ -55,7 +55,7 @@ class Predictor:
                 continue
             subset_boxes = boxes[mask, :]
             box_probs = torch.cat([subset_boxes, probs.reshape(-1, 1)], dim=1)
-            box_probs = bu.nms(box_probs, self.nms_method,
+            box_probs = craft_processors.nms(box_probs, self.nms_method,
                                       score_threshold=prob_threshold,
                                       iou_threshold=self.iou_threshold,
                                       sigma=self.sigma,
@@ -121,7 +121,7 @@ class Predictor_ONNX:
                 continue
             subset_boxes = boxes[mask, :]
             box_probs = torch.cat([subset_boxes, probs.reshape(-1, 1)], dim=1)
-            box_probs = bu.nms(box_probs, self.nms_method,
+            box_probs = craft_processors.nms(box_probs, self.nms_method,
                                       score_threshold=prob_threshold,
                                       iou_threshold=self.iou_threshold,
                                       sigma=self.sigma,
