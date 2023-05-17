@@ -224,16 +224,17 @@ if __name__ == '__main__':
                                     last_ids[spot_id] = -1
                                 elif conf >= main_configs['ocr_conf_threshold']:  # prediction != last_ln[cam_id][spot_id]
                                     responses[cam_id][spot_id] = True  # send_data(cam_images[last_ids[spot_id]], img, cam_id, prediction, date_time, conf, spot_id)
+                                    print(prediction)
+                                    if prediction in wl:
+                                        print("FINAL:", prediction, conf, label, color)
+                                        if last_req_time == 0 or time.time() - last_req_time >= main_configs['request_timeout']:
+                                            print('Requesting')
+                                            # request_to_barrier(barrier_configs['barrier_open_url'])
+                                            last_req_time = time.time()
+                                        else:
+                                            print("Can't send request, need timeout")
 
-                                    print("FINAL:", prediction, conf, label, color)
-                                    if last_req_time == 0 or time.time() - last_req_time >= main_configs['request_timeout']:
-                                        print('Requesting')
-                                        # request_to_barrier(barrier_configs['barrier_open_url'])
-                                        last_req_time = time.time()
-                                    else:
-                                        print("Can't send request, need timeout")
-
-                                    # last_ln[cam_id][spot_id] = prediction
+                                        # last_ln[cam_id][spot_id] = prediction
 
                                 elif conf < main_configs['ocr_conf_threshold']:
                                     last_ids[spot_id] = -1

@@ -124,7 +124,7 @@ if __name__ == '__main__':
     wait_time = 0
     last_req_time = 0
     color_classifier = CarColorClassifier()
-
+    car_log_index = 0
     while True:
         for frames in zip(*video_captures):
             do_break = False
@@ -207,8 +207,15 @@ if __name__ == '__main__':
 
                 draw_plate(ill_frames[cam_id], out)
                 for spot_id, img in spot_dict.items():
+                    cls = labels[car_ind_dict[spot_id]]
+                    label = car_det_configs['class_names'][cls]
+                    color = car_colors_dict[spot_id]
+
+                    os.mkdir(f"logs/car{car_log_index}")
+                    cv2.imwrite(f"logs/car{car_log_index}/{label}_{color}.jpg", cam_images[car_ind_dict[spot_id]])
                     spot = spots[cam_id][spot_id]
                     if img is not None:
+                        cv2.imwrite(f"logs/car{car_log_index}/plate.jpg", img)
                         number_images = crop_lines([img])
                         if len(number_images) > 0:
                             last_ids[spot_id] = -1
@@ -216,9 +223,13 @@ if __name__ == '__main__':
                                 date_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                                 prediction, conf = test_ocr(res)
                                 prediction = NumberProcess(prediction)
+                                for i in range(len(res)):
+                                    cv2.imwrite(f"logs/car{car_log_index}/line{nm_img_id}.jpg", np.array(res[i]))
+                                # print(prediction, conf)
                                 cls = labels[car_ind_dict[spot_id]]
                                 label = car_det_configs['class_names'][cls]
                                 color = car_colors_dict[spot_id]
+                                f = open(f"logs/car{car_log_index}/{prediction}_{conf}.txt", "x")
                                 if len(prediction) <= 3 or (len(prediction) == 4 and prediction[-2].isalpha()) or (
                                         len(prediction) == 6 and prediction[-2].isnumeric()):
                                     last_ids[spot_id] = -1
@@ -233,10 +244,12 @@ if __name__ == '__main__':
                                     else:
                                         print('Dont send request')
 
-                                    # last_ln[cam_id][spot_id] = prediction
+                                    last_ln[cam_id][spot_id] = prediction
 
                                 elif conf < main_configs['ocr_conf_threshold']:
                                     last_ids[spot_id] = -1
+                    car_log_index+=1
+
             wait_time = 0
             out_frame = show_images(ill_frames, width, height)
             cv2.imshow("Image", out_frame)

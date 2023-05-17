@@ -11,7 +11,7 @@ main_configs = {
     'nn_distance_metric': 'cosine',
     'batch_size': 8,
     'ocr_conf_threshold': 97,
-    'request_timeout': 3
+    'request_timeout': 2
 }
 
 barrier_configs = {
