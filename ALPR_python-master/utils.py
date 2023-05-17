@@ -81,10 +81,10 @@ def params_craft_refiner(net_craft, net_refiner):
             'refine': [refiner_input_name1, refiner_input_name2, refiner_label_name1]}
 
 
-def show_images(images, width, heihgt, k=3):
+def show_images(images, width, height, k=3, fps=''):
     j = -1
     if len(images) == 1:
-        return images[0]
+        return cv2.putText(images[0], fps, (500, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 0), 2)
     lists = []
     for i, im in enumerate(images):
 
@@ -94,7 +94,7 @@ def show_images(images, width, heihgt, k=3):
 
         lists[j].append(im)
     if len(lists) > 1:
-        resize_width, resize_height = width // k, int(np.ceil(heihgt // (len(lists))))
+        resize_width, resize_height = width // k, int(np.ceil(height // (len(lists))))
     else:
         resize_width, resize_height = 640, 480
     base_image = np.zeros((resize_height * len(lists), k * resize_width, 3), dtype=np.uint8)
@@ -109,7 +109,7 @@ def show_images(images, width, heihgt, k=3):
             current_x += image.shape[1]
         current_y += image.shape[0]
 
-    return base_image
+    return cv2.putText(base_image, fps, (500, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 0), 2)
 
 
 def convert_xywh(bbox):

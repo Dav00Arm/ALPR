@@ -8,6 +8,7 @@ import torch.backends.cudnn as cudnn
 from VideoCapture import VideoCaptureThreading
 from ocr_inference import test_ocr
 import pandas as pd
+import numpy as np
 from yolo_car_detection_inference import car_detection_yolo_one_id
 from utils import *
 from screeninfo import get_monitors
@@ -84,7 +85,6 @@ if __name__ == '__main__':
 
     last_idss = []
     spots = []
-    responses = []
     last_ln = []
     emergency_stop = False
     # if mc_address[0] != gma():
@@ -108,26 +108,23 @@ if __name__ == '__main__':
         encoders.append(gdet.create_box_encoder(main_configs['model_filename'], batch_size=main_configs['batch_size']))
         spots.append([])
         last_ln.append([])
-        responses.append([])
         for k, bbbox2 in enumerate(bbbox1):
             x1y1, x2y2, x3y3, x4y4 = [i for i in bbbox2]
             spots[j].append(Polygon([x1y1, x2y2, x3y3, x4y4]))
-            responses[j].append(False)
             last_ln[j].append(None)
 
         last_idss.append(np.negative(np.ones((len(spots[j])))))
 
     counter = 0
     do_update = True
-    start_time = time.time()
-    start = time.time()
-    wait_time = 0
     last_req_time = 0
     color_classifier = CarColorClassifier()
 
     while True:
+        frame_processing_start_time = 0
         for frames in zip(*video_captures):
             do_break = False
+            frame_processing_start_time = time.time()
             base_frames = list(frames)
             ill_frames = deepcopy(list(frames))
             frames = []
@@ -222,8 +219,7 @@ if __name__ == '__main__':
                                 if len(prediction) <= 3 or (len(prediction) == 4 and prediction[-2].isalpha()) or (
                                         len(prediction) == 6 and prediction[-2].isnumeric()):
                                     last_ids[spot_id] = -1
-                                elif conf >= main_configs['ocr_conf_threshold']:  # prediction != last_ln[cam_id][spot_id]
-                                    responses[cam_id][spot_id] = True  # send_data(cam_images[last_ids[spot_id]], img, cam_id, prediction, date_time, conf, spot_id)
+                                elif conf >= main_configs['ocr_conf_threshold']:
                                     print(prediction)
                                     if prediction in wl:
                                         print("FINAL:", prediction, conf, label, color)
@@ -234,39 +230,15 @@ if __name__ == '__main__':
                                         else:
                                             print("Can't send request, need timeout")
 
-                                        # last_ln[cam_id][spot_id] = prediction
-
                                 elif conf < main_configs['ocr_conf_threshold']:
                                     last_ids[spot_id] = -1
-            wait_time = 0
-            out_frame = show_images(ill_frames, width, height)
+
+            fps = 1 / (time.time() - frame_processing_start_time)
+            fps_text = "FPS: {:.2f}".format(fps)
+            out_frame = show_images(ill_frames, width, height, fps=fps_text)
             cv2.imshow("Image", out_frame)
 
             key = cv2.waitKey(1)
-            # for thr in threads:
-            #     if thr.stopping == True:
-            #         emergency_stop = True
-            # if time.time() - start_time > 100:
-            #     print("Reinitilize")
-            #     for thr in threads:
-            #         thr.stop()
-            #     del threads
-            #     del video_captures
-            #     threads = []
-            #     video_captures = []
-            #     for ip in camera_urls:
-            #         cap = VideoCaptureThreading(ip)
-            #         cap.start()
-            #         threads.append(cap)
-            #         video_captures.append(cap.generator())
-            #     start_time = time.time()
-            #     break
-            if key == ord('q'):  # or emergency_stop:
-                # cap = VideoCaptureThreading(ip_camera)
-                # cap.start()
-                # for thr in threads:
-                #     thr.stop()
+            if key == ord('q'):
                 cv2.destroyAllWindows()
                 break
-
-        wait_time = time.time() - start_time
