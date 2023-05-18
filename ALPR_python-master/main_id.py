@@ -1,33 +1,28 @@
 import os
 import json
-import time
 from draw_spots import SpotDrawing
 from license_plate_utils import *
 from craft_functions import crop_lines
 import torch.backends.cudnn as cudnn
 from VideoCapture import VideoCaptureThreading
 from ocr_inference import test_ocr
-import pandas as pd
-import numpy as np
 from yolo_car_detection_inference import car_detection_yolo_one_id
 from utils import *
 from screeninfo import get_monitors
 from copy import deepcopy
-import tracker_nms
-import tracker_distance
-from tracker_detection import Detection
-from tracker import Tracker
-import tracker_detection_generator as gdet
+import tracker.nms
+from tracker import distance
+from tracker.detection import Detection
+from tracker.tracker import Tracker
+import tracker.detection_generator as gdet
 import matplotlib.pyplot as plt
 import sys
 from shapely.geometry import Polygon
 import cv2
 from datetime import datetime
-from configs.general import main_configs, draw_configs, camera_configs, barrier_configs
+from configs.general import main_configs, draw_configs, camera_configs
 from configs.model_configs import car_det_configs
 from car_color_classifier import CarColorClassifier
-from send_data import request_to_barrier
-from getmac import get_mac_address as gma
 
 cudnn.benchmark = True
 cudnn.deterministic = True
@@ -99,7 +94,7 @@ if __name__ == '__main__':
 
     for j in range(len(camera_configs['camera_urls'])):
         bbbox1 = bbboxes[j]
-        metrices.append(tracker_distance.NearestNeighborDistanceMetric(
+        metrices.append(distance.NearestNeighborDistanceMetric(
             main_configs['nn_distance_metric'],
             main_configs['max_cosine_distance'],
             main_configs['nn_budget']
@@ -172,7 +167,7 @@ if __name__ == '__main__':
                 boxs = np.array([d.tlwh for d in detections])
                 scores = np.array([d.confidence for d in detections])
                 classes = np.array([d.class_name.to('cpu') for d in detections])
-                indices = tracker_nms.non_max_suppression(boxs, classes, main_configs['nms_max_overlap'], scores)
+                indices = tracker.nms.non_max_suppression(boxs, classes, main_configs['nms_max_overlap'], scores)
                 detections = [detections[i] for i in indices]
                 trackers[cam_id].predict()
                 trackers[cam_id].update(detections)
@@ -216,11 +211,11 @@ if __name__ == '__main__':
                                 cls = labels[car_ind_dict[spot_id]]
                                 label = car_det_configs['class_names'][cls]
                                 color = car_colors_dict[spot_id]
+                                print(prediction, conf, label, color)
                                 if len(prediction) <= 3 or (len(prediction) == 4 and prediction[-2].isalpha()) or (
                                         len(prediction) == 6 and prediction[-2].isnumeric()):
                                     last_ids[spot_id] = -1
                                 elif conf >= main_configs['ocr_conf_threshold']:
-                                    print(prediction)
                                     if prediction in wl:
                                         print("FINAL:", prediction, conf, label, color)
                                         if last_req_time == 0 or time.time() - last_req_time >= main_configs['request_timeout']:
