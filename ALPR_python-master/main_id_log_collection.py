@@ -2,11 +2,11 @@ import os
 import json
 from draw_spots import SpotDrawing
 from license_plate_utils import *
-from craft_functions import crop_lines
+from craft.functions import crop_lines
 import torch.backends.cudnn as cudnn
 from VideoCapture import VideoCaptureThreading
-from ocr_inference import test_ocr
-from yolo_car_detection_inference import car_detection_yolo_one_id
+from ocr.inference import test_ocr
+from yolo.inference import car_detection_yolo_one_id
 from utils import *
 from screeninfo import get_monitors
 from copy import deepcopy
@@ -32,6 +32,9 @@ if __name__ == '__main__':
     encoders = []
     metrices = []
     trackers = []
+
+    if not os.path.isdir(main_configs['logdir']):
+        os.mkdir(main_configs['logdir'])
 
     if user_configs['save_csv']:
         df = pd.DataFrame({'Path': [], 'Time': [], 'Plate': [], 'Confidence': []})
@@ -207,25 +210,25 @@ if __name__ == '__main__':
                     label = car_det_configs['class_names'][cls]
                     color = car_colors_dict[spot_id]
 
-                    os.mkdir(f"logs/car{car_log_index}")
-                    cv2.imwrite(f"logs/car{car_log_index}/{label}_{color}.jpg", cam_images[car_ind_dict[spot_id]])
+                    os.mkdir(f"{main_configs['logdir']}/car{car_log_index}")
+                    cv2.imwrite(f"{main_configs['logdir']}/car{car_log_index}/{label}_{color}.jpg", cam_images[car_ind_dict[spot_id]])
                     spot = spots[cam_id][spot_id]
                     if img is not None:
-                        cv2.imwrite(f"logs/car{car_log_index}/plate.jpg", img)
-                        number_images = crop_lines([img])
+                        cv2.imwrite(f"{main_configs['logdir']}/car{car_log_index}/plate.jpg", img)
+                        number_images = crop_lines([img])  # Refiner part(CRAFT)
                         if len(number_images) > 0:
                             last_ids[spot_id] = -1
                             for nm_img_id, res in enumerate(number_images):
                                 date_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-                                prediction, conf = test_ocr(res)
+                                prediction, conf = test_ocr(res)  # OCR part
                                 prediction = NumberProcess(prediction)
                                 for i in range(len(res)):
-                                    cv2.imwrite(f"logs/car{car_log_index}/line{nm_img_id}.jpg", np.array(res[i]))
+                                    cv2.imwrite(f"{main_configs['logdir']}/car{car_log_index}/line{nm_img_id}.jpg", np.array(res[i]))
                                 # print(prediction, conf)
                                 cls = labels[car_ind_dict[spot_id]]
                                 label = car_det_configs['class_names'][cls]
                                 color = car_colors_dict[spot_id]
-                                f = open(f"logs/car{car_log_index}/{prediction}_{conf}.txt", "x")
+                                f = open(f"{main_configs['logdir']}/car{car_log_index}/{prediction}_{conf}.txt", "x")
                                 if len(prediction) <= 3 or (len(prediction) == 4 and prediction[-2].isalpha()) or (
                                         len(prediction) == 6 and prediction[-2].isnumeric()):
                                     last_ids[spot_id] = -1

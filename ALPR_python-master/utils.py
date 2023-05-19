@@ -67,20 +67,6 @@ def copyStateDict(state_dict):
         new_state_dict[name] = v
     return new_state_dict
 
-
-def params_craft_refiner(net_craft, net_refiner):
-    craft_input_name1 = net_craft.get_inputs()[0].name
-    craft_label_name1 = net_craft.get_outputs()[0].name
-    craft_label_name2 = net_craft.get_outputs()[1].name
-
-    refiner_input_name1 = net_refiner.get_inputs()[0].name
-    refiner_input_name2 = net_refiner.get_inputs()[1].name
-    refiner_label_name1 = net_refiner.get_outputs()[0].name
-
-    return {'craft': [craft_input_name1, craft_label_name1, craft_label_name2],
-            'refine': [refiner_input_name1, refiner_input_name2, refiner_label_name1]}
-
-
 def show_images(images, width, height, k=3, fps=''):
     j = -1
     if len(images) == 1:

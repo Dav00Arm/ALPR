@@ -4,6 +4,12 @@ ALPR_python-master/deepsort_models/
 ALPR_python-master/__pycache__/
 ALPR_python-master/configs/__pycache__/
 ALPR_python-master/tracker/__pycache__/
+ALPR_python-master/craft/__pycache__/
+ALPR_python-master/plate_detection/__pycache__/
+ALPR_python-master/ocr/__pycache__/
+ALPR_python-master/scrypts/__pycache__/
+ALPR_python-master/logs/__pycache__/
+ALPR_python-master/yolo/__pycache__/
 .idea/
 ALPR_python-master/spot_config.json
 output.csv

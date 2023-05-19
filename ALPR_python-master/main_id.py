@@ -2,11 +2,11 @@ import os
 import json
 from draw_spots import SpotDrawing
 from license_plate_utils import *
-from craft_functions import crop_lines
+from craft.functions import crop_lines
 import torch.backends.cudnn as cudnn
 from VideoCapture import VideoCaptureThreading
-from ocr_inference import test_ocr
-from yolo_car_detection_inference import car_detection_yolo_one_id
+from ocr.inference import test_ocr
+from yolo.inference import car_detection_yolo_one_id
 from utils import *
 from screeninfo import get_monitors
 from copy import deepcopy
@@ -201,12 +201,12 @@ if __name__ == '__main__':
                 for spot_id, img in spot_dict.items():
                     spot = spots[cam_id][spot_id]
                     if img is not None:
-                        number_images = crop_lines([img])
+                        number_images = crop_lines([img])  # Refiner part(CRAFT)
                         if len(number_images) > 0:
                             last_ids[spot_id] = -1
                             for nm_img_id, res in enumerate(number_images):
                                 date_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-                                prediction, conf = test_ocr(res)
+                                prediction, conf = test_ocr(res)  # OCR part
                                 prediction = NumberProcess(prediction)
                                 cls = labels[car_ind_dict[spot_id]]
                                 label = car_det_configs['class_names'][cls]

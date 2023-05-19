@@ -1,12 +1,12 @@
 import torch
 import string
 import onnxruntime as ort
-from yolo_general_utils import check_img_size
+from yolo.general_utils import check_img_size
 from models_decrypt import decrypt_file, load_graph
-from yolo_common import DetectMultiBackend
-from ocr_CTC import AttnLabelConverter
-from ocr_dataset import MyAlignCollate
-from vslite import create_mobilenetv2_ssd_lite_predictor
+from yolo.common import DetectMultiBackend
+from ocr.CTC import AttnLabelConverter
+from ocr.dataset import MyAlignCollate
+from plate_detection.vslite import create_mobilenetv2_ssd_lite_predictor
 from configs.general import general_configs
 
 """Car detection"""
