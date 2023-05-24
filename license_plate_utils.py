@@ -1,5 +1,5 @@
 import numpy as np
-from configs.model_configs import plate_det_configs
+from PROJECT_Plate_Detection_Model_SOFTWARE_AI.plate_det_configs import plate_det_configs
 
 
 def convert_xywh(d):

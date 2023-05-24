@@ -8,13 +8,13 @@
 # import torchvision
 # import torch
 # from utils import copyStateDict
-# from craft.craft import CRAFT
-# from ocr.model import Model
+# from PROJECT_Refiner_Model_SOFTWARE_AI.craft import CRAFT
+# from PROJECT_Optical_Character_Recognition_Model_SOFTWARE_AI.model import Model
 # from __init__ import *
-# from ocr.utils import CTCLabelConverter
-# from ocr.utils import AttnLabelConverter
-# from craft.refinenet import RefineNet
-# import craft.imgproc as imgproc
+# from PROJECT_Optical_Character_Recognition_Model_SOFTWARE_AI.utils import CTCLabelConverter
+# from PROJECT_Optical_Character_Recognition_Model_SOFTWARE_AI.utils import AttnLabelConverter
+# from PROJECT_Refiner_Model_SOFTWARE_AI.refinenet import RefineNet
+# import PROJECT_Refiner_Model_SOFTWARE_AI.imgproc as imgproc
 # from craft.utils import test_net
 # import time
 ##############################
@@ -58,11 +58,11 @@
 # print(text_for_pred)
 
 """CONVERTER"""
-# from ocr.model import Model
+# from PROJECT_Optical_Character_Recognition_Model_SOFTWARE_AI.model import Model
 # from __init__ import *
 # import torch 
-# from ocr.utils import CTCLabelConverter
-# from ocr.utils import AttnLabelConverter
+# from PROJECT_Optical_Character_Recognition_Model_SOFTWARE_AI.utils import CTCLabelConverter
+# from PROJECT_Optical_Character_Recognition_Model_SOFTWARE_AI.utils import AttnLabelConverter
 # from torch.autograd import Variable
 # opt = argument()
 # if 'CTC' in opt.Prediction:
@@ -575,10 +575,10 @@
 '''---------------------------------------------------------------------------------------'''
 # import torch.nn as nn
 
-# from ocr.modules.transformation import TPS_SpatialTransformerNetwork
-# from ocr.modules.feature_extraction import VGG_FeatureExtractor, RCNN_FeatureExtractor, ResNet_FeatureExtractor
-# from ocr.modules.sequence_modeling import BidirectionalLSTM
-# from ocr.modules.prediction import Attention
+# from PROJECT_Optical_Character_Recognition_Model_SOFTWARE_AI.modules.transformation import TPS_SpatialTransformerNetwork
+# from PROJECT_Optical_Character_Recognition_Model_SOFTWARE_AI.modules.feature_extraction import VGG_FeatureExtractor, RCNN_FeatureExtractor, ResNet_FeatureExtractor
+# from PROJECT_Optical_Character_Recognition_Model_SOFTWARE_AI.modules.sequence_modeling import BidirectionalLSTM
+# from PROJECT_Optical_Character_Recognition_Model_SOFTWARE_AI.modules.prediction import Attention
 
 
 # class Model(nn.Module):
