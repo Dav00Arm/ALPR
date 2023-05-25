@@ -2,7 +2,7 @@ import os
 import json
 from draw_spots import SpotDrawing
 from license_plate_utils import *
-from PROJECT_Refiner_Model_SOFTWARE_AI.functions import crop_lines
+from PROJECT_Text_Detection_Model_SOFTWARE_AI.functions import crop_lines
 import torch.backends.cudnn as cudnn
 from VideoCapture import VideoCaptureThreading
 from PROJECT_Optical_Character_Recognition_Model_SOFTWARE_AI.inference import test_ocr

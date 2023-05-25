@@ -1,6 +1,3 @@
-[submodule "PROJECT_Refiner_Model_SOFTWARE_AI"]
-	path = PROJECT_Refiner_Model_SOFTWARE_AI
-	url = https://github.com/Locator-CJSC/PROJECT_Refiner_Model_SOFTWARE_AI.git
 [submodule "PROJECT_Optical_Character_Recognition_Model_SOFTWARE_AI"]
 	path = PROJECT_Optical_Character_Recognition_Model_SOFTWARE_AI
 	url = https://github.com/Locator-CJSC/PROJECT_Optical_Character_Recognition_Model_SOFTWARE_AI.git
@@ -10,3 +7,6 @@
 [submodule "PROJECT_Car_Detection_Model_SOFTWARE_AI"]
 	path = PROJECT_Car_Detection_Model_SOFTWARE_AI
 	url = https://github.com/Locator-CJSC/PROJECT_Car_Detection_Model_SOFTWARE_AI.git
+[submodule "PROJECT_Text_Detection_Model_SOFTWARE_AI"]
+	path = PROJECT_Text_Detection_Model_SOFTWARE_AI
+	url = https://github.com/Locator-CJSC/PROJECT_Text_Detection_Model_SOFTWARE_AI.git

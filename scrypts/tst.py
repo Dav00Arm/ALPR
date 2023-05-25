@@ -8,13 +8,13 @@
 # import torchvision
 # import torch
 # from utils import copyStateDict
-# from PROJECT_Refiner_Model_SOFTWARE_AI.craft import CRAFT
+# from PROJECT_Text_Detection_Model_SOFTWARE_AI.craft import CRAFT
 # from PROJECT_Optical_Character_Recognition_Model_SOFTWARE_AI.model import Model
 # from __init__ import *
 # from PROJECT_Optical_Character_Recognition_Model_SOFTWARE_AI.utils import CTCLabelConverter
 # from PROJECT_Optical_Character_Recognition_Model_SOFTWARE_AI.utils import AttnLabelConverter
-# from PROJECT_Refiner_Model_SOFTWARE_AI.refinenet import RefineNet
-# import PROJECT_Refiner_Model_SOFTWARE_AI.imgproc as imgproc
+# from PROJECT_Text_Detection_Model_SOFTWARE_AI.refinenet import RefineNet
+# import PROJECT_Text_Detection_Model_SOFTWARE_AI.imgproc as imgproc
 # from craft.utils import test_net
 # import time
 ##############################
