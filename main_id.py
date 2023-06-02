@@ -20,9 +20,10 @@ import sys
 from shapely.geometry import Polygon
 import cv2
 from datetime import datetime
-from configs.general import main_configs, draw_configs, camera_configs
+from configs.general import main_configs, draw_configs, camera_configs, barrier_configs
 from PROJECT_Car_Detection_Model_SOFTWARE_AI.car_det_configs import model_configs
 from car_color_classifier import CarColorClassifier
+from send_data import request_to_barrier
 
 cudnn.benchmark = True
 cudnn.deterministic = True

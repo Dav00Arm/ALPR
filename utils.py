@@ -70,7 +70,7 @@ def copyStateDict(state_dict):
 def show_images(images, width, height, k=3, fps=''):
     j = -1
     if len(images) == 1:
-        return cv2.putText(images[0], fps, (500, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 0), 2)
+        return cv2.putText(images[0], fps, (500, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 0), 2)
     lists = []
     for i, im in enumerate(images):
 
