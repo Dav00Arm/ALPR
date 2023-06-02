@@ -1,5 +1,4 @@
 import yaml
-import torch
 
 main_configs = {
     'max_cosine_distance': 0.5,
